@@ -1,18 +1,25 @@
 {
   "name": "rest-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "This API provides essential functionalities for managing users and products in an e-commerce platform.",
+  "main": "server.js",
   "scripts": {
     "dev": "nodemon -r esm server.js",
     "start": "node -r esm server.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "express",
+    "mongodb"
+  ],
+  "author": "Istiak Ahammad",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "esm": "^3.2.25",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^6.7.3"
   }
 }
