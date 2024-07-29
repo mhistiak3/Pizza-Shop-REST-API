@@ -8,6 +8,7 @@ import {
   productController,
 } from "../controllers";
 import auth from "../middleware/auth";
+import admin from "../middleware/admin";
 
 // Application Routes
 const router = express.Router();
@@ -20,6 +21,7 @@ router.post("/refresh", refreshController.refresh);
 router.post("/logout", auth, loginController.logout);
 
 // HACK: Products Routes
-router.post("/products",productController.store);
+router.post("/products", [auth, admin], productController.store);
+router.put("/products/:id", [auth, admin], productController.update);
 
 export default router;

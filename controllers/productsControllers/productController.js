@@ -4,6 +4,7 @@ import fs from "fs";
 import Joi from "joi";
 import CustomErrorHandler from "../../services/CustomErrorHandler";
 import { Product } from "../../models";
+import productSchema from "../../validators/productValidators";
 
 // image upload Upload
 const storage = multer.diskStorage({
@@ -49,11 +50,6 @@ const productController = {
       const filePath = req.file.path;
 
       //   HACK: validation
-      const productSchema = Joi.object({
-        name: Joi.string().required(),
-        price: Joi.number().required(),
-        size: Joi.string().required(),
-      });
       const { error } = productSchema.validate(req.body);
 
       //   HACK: if error come s in validation then image will delete .
@@ -76,6 +72,57 @@ const productController = {
           price,
           image: filePath,
         });
+
+        // HACK: send response
+        res.status(201).json(document);
+      } catch (error) {
+        next(error);
+      }
+    });
+  },
+
+  async update(req, res, next) {
+    uploadImage(req, res, async (err) => {
+      if (err) {
+        return next(err);
+      }
+      let filePath;
+      if (req.file) {
+        
+        filePath = req.file.path;
+      }
+
+      //   HACK: validation
+      const { error } = productSchema.validate(req.body);
+
+      //   HACK: if error come s in validation then image will delete .
+      if (error) {
+        if (req.file) {
+          // delete image
+          fs.unlink(`${appRoote}/${filePath}`, (err) => {
+            if (err) {
+              return next(CustomErrorHandler.serverError(err.message));
+            }
+          });
+        }
+        return next(error);
+      }
+
+      //  HACK: Update a product in database
+      try {
+        const { name, size, price } = req.body;
+        let document = await Product.findByIdAndUpdate(
+          { _id: req.params.id },
+          {
+            $set: {
+              name,
+              size,
+              price,
+              ...(req.file && { image: filePath }),
+            },
+          },
+          { new: true }
+        );
 
         // HACK: send response
         res.status(201).json(document);
