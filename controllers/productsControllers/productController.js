@@ -88,7 +88,6 @@ const productController = {
       }
       let filePath;
       if (req.file) {
-        
         filePath = req.file.path;
       }
 
@@ -130,6 +129,27 @@ const productController = {
         next(error);
       }
     });
+  },
+
+  async destroy(req, res, next) {
+    try {
+      // HACK: delete product
+      const document = await Product.findOneAndRemove({ _id: req.params.id });
+      if (!document) {
+       return next(new Error("Nothing to delete"));
+      }
+      // HACK: delete image
+      const imagePath = document.image;
+      fs.unlink(`${appRoote}/${imagePath}`, (err) => {
+        if (err) {
+          return next(err);
+        }
+      });
+
+      res.json(document);
+    } catch (error) {
+      next(error);
+    }
   },
 };
 export default productController;
