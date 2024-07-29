@@ -1,8 +1,9 @@
 import Joi from "joi";
 import bcrypt from "bcrypt";
-import { User } from "../../models";
+import { RefreshToken, User } from "../../models";
 import CustomErrorHandler from "../../services/CustomErrorHandler";
 import JwtService from "../../services/JwtService";
+import { REFRESH_SECRET } from "../../config";
 
 const loginController = {
   async login(req, res, next) {
@@ -38,10 +39,19 @@ const loginController = {
         _id: user._id,
         role: user.role,
       });
+      // HACK: generate refresh token and whitlist in database
+      const refresh_token = JwtService.sign(
+        {
+          _id: user._id,
+          role: user.role,
+        },
+        "30d",
+        REFRESH_SECRET
+      );
+      await RefreshToken.create({ token: refresh_token });
 
       // HACK: send response
-      res.json({ access_token, message: "Login success" });
-
+      res.json({ access_token, refresh_token });
     } catch (error) {
       next(error);
     }
