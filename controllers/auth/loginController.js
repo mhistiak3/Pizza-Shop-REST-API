@@ -6,6 +6,7 @@ import JwtService from "../../services/JwtService";
 import { REFRESH_SECRET } from "../../config";
 
 const loginController = {
+  // HACK: login
   async login(req, res, next) {
     // HACK: Validation
     const loginSchema = Joi.object({
@@ -52,6 +53,26 @@ const loginController = {
 
       // HACK: send response
       res.json({ access_token, refresh_token });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // HACK: logout
+  async logout(req,res,next) {
+    // HACK: validate refresh token
+    const refreshSchema = Joi.object({
+      refresh_token: Joi.string().required(),
+    });
+    const { error } = refreshSchema.validate(req.body);
+    if (error) {
+      return next(error);
+    }
+    try {
+      await RefreshToken.deleteOne({ token: req.body.refresh_token });
+      res.json({
+        message:"Refresh token delete succesfully"
+      })
     } catch (error) {
       next(error);
     }
