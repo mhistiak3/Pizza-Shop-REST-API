@@ -1,10 +1,9 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import Joi from "joi";
-import CustomErrorHandler from "../../services/CustomErrorHandler";
-import { Product } from "../../models";
-import productSchema from "../../validators/productValidators";
+import CustomErrorHandler from "../services/CustomErrorHandler";
+import { Product } from "../models";
+import productSchema from "../validators/productValidators";
 
 // image upload Upload
 const storage = multer.diskStorage({
@@ -96,7 +95,7 @@ const productController = {
         if (!product) {
           return next(new Error("Nothing to delete"));
         }
-        fs.unlink(`${appRoote}/${product.image}`, (err) => {
+        fs.unlink(`${appRoote}/${product._doc.image}`, (err) => {
           if (err) {
             return next(err);
           }
@@ -152,7 +151,7 @@ const productController = {
         return next(new Error("Nothing to delete"));
       }
       // HACK: delete image
-      const imagePath = document.image;
+      const imagePath = document._doc.image;
       fs.unlink(`${appRoote}/${imagePath}`, (err) => {
         if (err) {
           return next(err);
@@ -164,7 +163,7 @@ const productController = {
       next(error);
     }
   },
-  // function: get product from database
+  // function: get all product from database
   async index(req, res, next) {
     try {
       const document = await Product.find()
@@ -176,17 +175,17 @@ const productController = {
     }
   },
 
-  //
+  // function: get single product from database
   async show(req, res, next) {
     try {
       const document = await Product.findOne({ _id: req.params.id }).select(
         "-updatedAt -__v"
       );
       if (!document) {
-        return next(new Error("Product not found"))
+        return next(new Error("Product not found"));
       }
 
-      res.json(document)
+      res.json(document);
     } catch (error) {
       next(error);
     }
