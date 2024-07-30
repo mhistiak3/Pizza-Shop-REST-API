@@ -25,6 +25,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // Routes Middleware
 app.use("/api", routes);
+app.use("/uploads",express.static('uploads'))
 
 // Error Handling Middleware
 app.use(errorHandler);

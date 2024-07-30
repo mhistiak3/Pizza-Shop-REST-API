@@ -90,20 +90,19 @@ const productController = {
       let filePath;
       if (req.file) {
         // HACK: delete image if image is uploded
-         const product = await Product.findOne({
-           _id: req.params.id,
-         });
-         if (!product) {
-           return next(new Error("Nothing to delete"));
-         }
-          fs.unlink(`${appRoote}/${product.image}`, (err) => {
-            if (err) {
-              return next(err);
-            }
-          });
+        const product = await Product.findOne({
+          _id: req.params.id,
+        });
+        if (!product) {
+          return next(new Error("Nothing to delete"));
+        }
+        fs.unlink(`${appRoote}/${product.image}`, (err) => {
+          if (err) {
+            return next(err);
+          }
+        });
         filePath = req.file.path;
       }
-
 
       //   HACK: validation
       const { error } = productSchema.validate(req.body);
@@ -166,8 +165,15 @@ const productController = {
     }
   },
   // function: get product from database
-  index(req,res,next) {
-
+  async index(req, res, next) {
+    try {
+      const document = await Product.find()
+        .select("-updatedAt -__v")
+        .sort({ updatedAt :-1});
+      res.json({ document });
+    } catch (error) {
+      next(err);
+    }
   },
 };
 export default productController;
