@@ -42,6 +42,7 @@ const uploadImage = multer({
 }).single("image");
 
 const productController = {
+  // function: store product in database
   async store(req, res, next) {
     uploadImage(req, res, async (err) => {
       if (err) {
@@ -80,7 +81,7 @@ const productController = {
       }
     });
   },
-
+  // function: update product in database
   async update(req, res, next) {
     uploadImage(req, res, async (err) => {
       if (err) {
@@ -88,8 +89,21 @@ const productController = {
       }
       let filePath;
       if (req.file) {
+        // HACK: delete image if image is uploded
+         const product = await Product.findOne({
+           _id: req.params.id,
+         });
+         if (!product) {
+           return next(new Error("Nothing to delete"));
+         }
+          fs.unlink(`${appRoote}/${product.image}`, (err) => {
+            if (err) {
+              return next(err);
+            }
+          });
         filePath = req.file.path;
       }
+
 
       //   HACK: validation
       const { error } = productSchema.validate(req.body);
@@ -130,13 +144,13 @@ const productController = {
       }
     });
   },
-
+  // function: delete product from database
   async destroy(req, res, next) {
     try {
       // HACK: delete product
       const document = await Product.findOneAndRemove({ _id: req.params.id });
       if (!document) {
-       return next(new Error("Nothing to delete"));
+        return next(new Error("Nothing to delete"));
       }
       // HACK: delete image
       const imagePath = document.image;
@@ -150,6 +164,10 @@ const productController = {
     } catch (error) {
       next(error);
     }
+  },
+  // function: get product from database
+  index(req,res,next) {
+
   },
 };
 export default productController;
