@@ -169,10 +169,26 @@ const productController = {
     try {
       const document = await Product.find()
         .select("-updatedAt -__v")
-        .sort({ updatedAt :-1});
+        .sort({ updatedAt: -1 });
       res.json({ document });
     } catch (error) {
       next(err);
+    }
+  },
+
+  //
+  async show(req, res, next) {
+    try {
+      const document = await Product.findOne({ _id: req.params.id }).select(
+        "-updatedAt -__v"
+      );
+      if (!document) {
+        return next(new Error("Product not found"))
+      }
+
+      res.json(document)
+    } catch (error) {
+      next(error);
     }
   },
 };
