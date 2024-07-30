@@ -39,8 +39,11 @@ This project is a RESTful API for a pizza shop, built using Node.js, Express, an
 
 4. Create a `.env` file in the root directory and add your MongoDB URI and JWT secret:
    ```env
-   MONGO_URI=your_mongodb_uri
+   DB_URL=your_mongodb_uri
    JWT_SECRET=your_jwt_secret
+   APP_PORT=your_app_port
+   REFRESH_SECRET=your_refresh_secret
+   APP_URL=your_app_url
    ```
 
 5. Start the server:
