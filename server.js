@@ -5,7 +5,6 @@ import routes from "./routes";
 import errorHandler from "./middleware/errorHandler";
 import mongoose from "mongoose";
 import path from "path";
-import { extend } from "joi";
 
 // app object
 const app = express();
